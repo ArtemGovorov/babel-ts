@@ -1,21 +1,15 @@
 module.exports = function(wallaby) {
   const testPathExp = 'src/**/*.test.ts?(x)';
 
-  var path = require('path');
-  process.env.NODE_PATH +=
-    path.delimiter +
-    wallaby.projectCacheDir +
-    path.delimiter +
-    path.join(__dirname, 'node_modules/react-scripts/node_modules') +
-    path.delimiter +
-    path.join(__dirname, 'node_modules');
+  process.env.NODE_ENV = 'test';
 
   return {
     files: [
       'tsconfig.json',
       'tsconfig.test.json',
       'src/**/*.+(js|jsx|ts|tsx|json|snap|css|less|sass|scss|jpg|jpeg|gif|png|svg|graphql)',
-      `!${testPathExp}`
+      `!${testPathExp}`,
+      '!src/**/*.d.ts'
     ],
 
     tests: [testPathExp],
@@ -26,13 +20,9 @@ module.exports = function(wallaby) {
     },
 
     compilers: {
-      '**/*.js?(x)': wallaby.compilers.babel({
-        babel: require('@babel/core'),
-        presets: ['react-app']
-      }),
-      '**/*.ts?(x)': wallaby.compilers.typeScript({
-        module: 'commonjs',
-        jsx: 'React'
+      '**/*.ts?(x)': wallaby.compilers.babel({
+        presets: ['@babel/react', '@babel/typescript'],
+        plugins: ['module:jsx-control-statements',  '@babel/proposal-class-properties']
       })
     },
 
